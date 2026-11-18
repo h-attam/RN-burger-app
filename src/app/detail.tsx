@@ -62,20 +62,20 @@ export default function ProductDetailScreen() {
     }
   }, [animProgress]);
 
-  // Burger Animasyon Stili (Sağdan sola kayma + öne gelerek büyüme)
+  // Burger Animasyon Stili (Daha sağdan başlayıp tam ORTADA konumlanma + öne gelerek büyüme)
   const animatedBurgerStyle = useAnimatedStyle(() => {
     const tx = interpolate(
       animProgress.value,
       [0, 1],
-      [SCREEN_WIDTH * 0.08, -SCREEN_WIDTH * 0.06]
+      [SCREEN_WIDTH * 0.22, 0]
     );
     const ty = interpolate(
       animProgress.value,
       [0, 1],
-      [0, -SCREEN_WIDTH * 0.02]
+      [SCREEN_WIDTH * 0.02, 0]
     );
-    const scale = interpolate(animProgress.value, [0, 1], [0.93, 1.08]);
-    const rot = interpolate(animProgress.value, [0, 1], [0, -3]);
+    const scale = interpolate(animProgress.value, [0, 1], [0.92, 1.04]);
+    const rot = interpolate(animProgress.value, [0, 1], [3, 0]);
 
     return {
       transform: [
@@ -87,20 +87,20 @@ export default function ProductDetailScreen() {
     };
   });
 
-  // Domates Dilimi Animasyon Stili (Sağ alttan sol öne doğru fırlama ve büyüme)
+  // Domates Dilimi Animasyon Stili (Sağ alttan sol öne doğru fırlama ve dengeli konumlanma)
   const animatedTomatoStyle = useAnimatedStyle(() => {
     const tx = interpolate(
       animProgress.value,
       [0, 1],
-      [SCREEN_WIDTH * 0.28, -SCREEN_WIDTH * 0.2]
+      [SCREEN_WIDTH * 0.34, -SCREEN_WIDTH * 0.08]
     );
     const ty = interpolate(
       animProgress.value,
       [0, 1],
-      [SCREEN_WIDTH * 0.12, SCREEN_WIDTH * 0.18]
+      [SCREEN_WIDTH * 0.12, SCREEN_WIDTH * 0.16]
     );
-    const scale = interpolate(animProgress.value, [0, 1], [0.72, 1.15]);
-    const rot = interpolate(animProgress.value, [0, 1], [18, -14]);
+    const scale = interpolate(animProgress.value, [0, 1], [0.70, 1.04]);
+    const rot = interpolate(animProgress.value, [0, 1], [18, -12]);
 
     return {
       transform: [
@@ -119,15 +119,13 @@ export default function ProductDetailScreen() {
           transition: 'transform 850ms cubic-bezier(0.33, 1, 0.68, 1)',
           transform: [
             {
-              translateX: webAnimated
-                ? -SCREEN_WIDTH * 0.06
-                : SCREEN_WIDTH * 0.08,
+              translateX: webAnimated ? 0 : SCREEN_WIDTH * 0.22,
             },
             {
-              translateY: webAnimated ? -SCREEN_WIDTH * 0.02 : 0,
+              translateY: webAnimated ? 0 : SCREEN_WIDTH * 0.02,
             },
-            { scale: webAnimated ? 1.08 : 0.93 },
-            { rotate: webAnimated ? '-3deg' : '0deg' },
+            { scale: webAnimated ? 1.04 : 0.92 },
+            { rotate: webAnimated ? '0deg' : '3deg' },
           ],
         } as any)
       : undefined;
@@ -139,16 +137,16 @@ export default function ProductDetailScreen() {
           transform: [
             {
               translateX: webAnimated
-                ? -SCREEN_WIDTH * 0.2
-                : SCREEN_WIDTH * 0.28,
+                ? -SCREEN_WIDTH * 0.08
+                : SCREEN_WIDTH * 0.34,
             },
             {
               translateY: webAnimated
-                ? SCREEN_WIDTH * 0.18
+                ? SCREEN_WIDTH * 0.16
                 : SCREEN_WIDTH * 0.12,
             },
-            { scale: webAnimated ? 1.15 : 0.72 },
-            { rotate: webAnimated ? '-14deg' : '18deg' },
+            { scale: webAnimated ? 1.04 : 0.70 },
+            { rotate: webAnimated ? '-12deg' : '18deg' },
           ],
         } as any)
       : undefined;
@@ -285,14 +283,14 @@ const styles = StyleSheet.create({
     minHeight: SCREEN_HEIGHT * 0.38,
   },
   burgerImage: {
-    width: Math.min(SCREEN_WIDTH * 0.96, 420),
-    height: Math.min(SCREEN_WIDTH * 0.74, 320),
+    width: Math.min(SCREEN_WIDTH * 0.94, 400),
+    height: Math.min(SCREEN_WIDTH * 0.72, 310),
     zIndex: 2,
   },
   tomatoImage: {
     position: 'absolute',
-    width: Math.min(SCREEN_WIDTH * 0.65, 270),
-    height: Math.min(SCREEN_WIDTH * 0.46, 190),
+    width: Math.min(SCREEN_WIDTH * 0.54, 230),
+    height: Math.min(SCREEN_WIDTH * 0.39, 165),
     zIndex: 10,
   },
   bottomContent: {
