@@ -32,34 +32,111 @@ interface BurgerItem {
 
 const BURGERS: BurgerItem[] = [
   {
-    id: '1',
+    id: 'b1',
     name: 'Beef Burger',
     description: 'Beef with cheese',
     price: '$18.00',
     image: require('@/assets/burgers/beef-burger.png'),
   },
   {
-    id: '2',
+    id: 'b2',
     name: 'Rancho Burger',
     description: 'Beef with egg',
     price: '$16.00',
     image: require('@/assets/burgers/rancho-burger.png'),
   },
   {
-    id: '3',
+    id: 'b3',
     name: 'Tehas Burger',
     description: 'Beef with tomato',
     price: '$12.00',
     image: require('@/assets/burgers/tehas-burger.png'),
   },
   {
-    id: '4',
+    id: 'b4',
     name: 'Chicken Burger',
     description: 'Beef with chiken',
     price: '$9.00',
     image: require('@/assets/burgers/chicken-burger.png'),
   },
 ];
+
+const PASTAS: BurgerItem[] = [
+  {
+    id: 'p1',
+    name: 'Carbonara',
+    description: 'Spaghetti with bacon',
+    price: '$14.00',
+    image: require('@/assets/pasta/carbonara.png'),
+  },
+  {
+    id: 'p2',
+    name: 'Bolognese',
+    description: 'Tagliatelle beef ragu',
+    price: '$15.00',
+    image: require('@/assets/pasta/bolognese.png'),
+  },
+  {
+    id: 'p3',
+    name: 'Pesto Fusilli',
+    description: 'Fresh basil & pine nuts',
+    price: '$13.00',
+    image: require('@/assets/pasta/pesto.png'),
+  },
+  {
+    id: 'p4',
+    name: 'Seafood Pasta',
+    description: 'Garlic cream & shrimp',
+    price: '$17.00',
+    image: require('@/assets/pasta/seafood-pasta.png'),
+  },
+];
+
+const SALADS: BurgerItem[] = [
+  {
+    id: 's1',
+    name: 'Caesar Salad',
+    description: 'Chicken & parmesan',
+    price: '$11.00',
+    image: require('@/assets/salads/caesar-salad.png'),
+  },
+  {
+    id: 's2',
+    name: 'Greek Salad',
+    description: 'Feta & kalamata olives',
+    price: '$10.00',
+    image: require('@/assets/salads/greek-salad.png'),
+  },
+  {
+    id: 's3',
+    name: 'Avocado Salad',
+    description: 'Fresh greens & seeds',
+    price: '$12.00',
+    image: require('@/assets/salads/avocado-salad.png'),
+  },
+  {
+    id: 's4',
+    name: 'Caprese Salad',
+    description: 'Mozzarella & tomato',
+    price: '$11.00',
+    image: require('@/assets/salads/caprese-salad.png'),
+  },
+];
+
+const CATEGORY_DATA: Record<string, { subtitle: string; items: BurgerItem[] }> = {
+  Burger: {
+    subtitle: 'delicious burgers!',
+    items: BURGERS,
+  },
+  Pasta: {
+    subtitle: 'delicious pastas!',
+    items: PASTAS,
+  },
+  Salads: {
+    subtitle: 'fresh salads!',
+    items: SALADS,
+  },
+};
 
 const CATEGORIES = ['Burger', 'Pasta', 'Salads'];
 
@@ -283,7 +360,9 @@ export default function HomeScreen() {
           {/* Title & Subtitle */}
           <View style={styles.titleSection}>
             <Text style={styles.titleText}>Good Bites</Text>
-            <Text style={styles.subtitleText}>delicious burgers!</Text>
+            <Text style={styles.subtitleText}>
+              {CATEGORY_DATA[selectedCategory]?.subtitle ?? 'delicious burgers!'}
+            </Text>
           </View>
 
           {/* Category Tabs Pill Bar */}
@@ -318,12 +397,12 @@ export default function HomeScreen() {
             </TouchableOpacity>
           </View>
 
-          {/* Burgers 2-Column Grid */}
+          {/* Products 2-Column Grid */}
           <View style={styles.gridContainer}>
-            {BURGERS.map((burger, index) => (
+            {(CATEGORY_DATA[selectedCategory]?.items ?? BURGERS).map((item, index) => (
               <AnimatedBurgerCard
-                key={burger.id}
-                burger={burger}
+                key={item.id}
+                burger={item}
                 index={index}
               />
             ))}
