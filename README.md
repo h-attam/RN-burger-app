@@ -4,11 +4,12 @@ Bu proje, modern bir mobil restoran ve burger siparis arayuzunun Figma tasarimin
 
 ## Ekran Goruntusu
 
-<img src="./assets/app-demo.gif" width="300" alt="Ekran Goruntusu" />
+<img src="./assets/Screen-2026-11-18-043908.gif" width="300" alt="Ekran Goruntusu" />
 
 ## Tasarim Referansi
 
 Uygulamanin tum ekranlari, bilesenleri, renk paletleri ve animasyon akislari ozel bir Figma tasarimi referans alinarak hazirlanmistir:
+
 - Derin mavi ve mor tonlarindaki ozel arka plan gradyanlari
 - Urun listeleme kartlari ve hover/dokunma efektleri
 - Urun detay sayfasindaki dinamik perspektif ve gecis animasyonlari
@@ -30,6 +31,7 @@ Uygulamanin tum ekranlari, bilesenleri, renk paletleri ve animasyon akislari oze
 ## Ekranlar ve Ozellikler
 
 ### 1. Ana Sayfa (Home Screen)
+
 - Sol ust menu butonu ve bildirim zili
 - Baslik ve kategoriye gore dinamik alt baslik alani
 - Kategori secim kapsulleri (Burger, Pasta, Salads)
@@ -39,6 +41,7 @@ Uygulamanin tum ekranlari, bilesenleri, renk paletleri ve animasyon akislari oze
 - Alt gezinme cubugu (Ozel sepet butonu ve konum/kumbara ikonlari)
 
 ### 2. Urun Detay Sayfasi (Product Detail Screen)
+
 - Geri donus ve secenekler ust cubugu
 - Giris Animasyonu: Detay sayfasina girildiginde burger ve dilimlenmis domates gorselleri sagdan ekrana girer; burger tam ortaya otururken domates dilimi one ve sola dogru firlayarak perspektif etkisi olusturur.
 - Cift Burger Animasyonu: Miktar artirildiginda (adet 2 veya uzeri oldugunda), birinci burgerin arkasindan ikinci bir burger animasyonla sag uste cikar ve on burger hafif sola acilarak derinlik saglar. Miktar 1'e dusuruldugunde arka burger tekrar saklanir.
@@ -46,6 +49,7 @@ Uygulamanin tum ekranlari, bilesenleri, renk paletleri ve animasyon akislari oze
 - Ozel pembe "Add to cart" butonu.
 
 ### 3. Sepet Onay Ekrani (Cart Success Screen)
+
 - Figma Frame 9 tasarimiyla birebir uyumlu onay ekrani.
 - Pembe kutucuk ve cift onay (tick) isareti.
 - "Done!" ve "Oder added to the cart" bilgilendirme metinleri.
@@ -56,16 +60,19 @@ Uygulamanin tum ekranlari, bilesenleri, renk paletleri ve animasyon akislari oze
 Projeyi yerel ortamda calistirmak icin asagidaki adimlari izleyebilirsiniz:
 
 1. Bagimliliklari yukleyin:
+
 ```bash
 npm install
 ```
 
 2. Gelistirme sunucusunu baslatin:
+
 ```bash
 npx expo start
 ```
 
 3. Uygulamayi calistirmak istediginiz platformu secin:
+
 - iOS Simulator icin: Terminalde `i` tusuna basin
 - Android Emulator icin: Terminalde `a` tusuna basin
 - Web tarayici icin: Terminalde `w` tusuna basin
