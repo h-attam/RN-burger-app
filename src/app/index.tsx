@@ -1,16 +1,23 @@
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { StatusBar } from 'expo-status-bar';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Dimensions,
   Image,
+  Platform,
+  Pressable,
   ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from 'react-native';
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
+} from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
@@ -56,6 +63,186 @@ const BURGERS: BurgerItem[] = [
 
 const CATEGORIES = ['Burger', 'Pasta', 'Salads'];
 
+function BurgerCardContent({
+  burger,
+  index,
+  isHovered,
+}: {
+  burger: BurgerItem;
+  index: number;
+  isHovered: boolean;
+}) {
+  // 1. ve 3. ürünler (sol kolon, index 0 ve 2) -> Sağa dönecek (+10deg)
+  // 2. ve 4. ürünler (sağ kolon, index 1 ve 3) -> Sola dönecek (-10deg)
+  const isRightColumn = index % 2 === 1;
+  const targetRotation = isRightColumn ? -10 : 10;
+
+  const scale = useSharedValue(1);
+  const rotate = useSharedValue(0);
+  const translateY = useSharedValue(0);
+  const glowScale = useSharedValue(1);
+
+  useEffect(() => {
+    scale.value = withSpring(isHovered ? 1.62 : 1, {
+      damping: 14,
+      stiffness: 180,
+    });
+    rotate.value = withSpring(isHovered ? targetRotation : 0, {
+      damping: 14,
+      stiffness: 180,
+    });
+    translateY.value = withSpring(isHovered ? -14 : 0, {
+      damping: 14,
+      stiffness: 180,
+    });
+    glowScale.value = withSpring(isHovered ? 1.15 : 1, {
+      damping: 14,
+      stiffness: 180,
+    });
+  }, [isHovered, targetRotation, scale, rotate, translateY, glowScale]);
+
+  const animatedBurgerStyle = useAnimatedStyle(() => {
+    return {
+      transform: [
+        { translateY: translateY.value },
+        { rotate: `${rotate.value}deg` },
+        { scale: scale.value },
+      ],
+    };
+  });
+
+  const animatedGlowStyle = useAnimatedStyle(() => {
+    return {
+      transform: [{ scale: glowScale.value }],
+    };
+  });
+
+  const webBurgerStyle =
+    Platform.OS === 'web'
+      ? ({
+          transitionProperty: 'transform',
+          transitionDuration: '300ms',
+          transitionTimingFunction: 'cubic-bezier(0.34, 1.56, 0.64, 1)',
+          transform: [
+            { translateY: isHovered ? -14 : 0 },
+            { rotate: isHovered ? `${targetRotation}deg` : '0deg' },
+            { scale: isHovered ? 1.62 : 1 },
+          ],
+        } as any)
+      : undefined;
+
+  const webGlowStyle =
+    Platform.OS === 'web'
+      ? ({
+          transitionProperty: 'transform',
+          transitionDuration: '300ms',
+          transitionTimingFunction: 'cubic-bezier(0.34, 1.56, 0.64, 1)',
+          transform: [{ scale: isHovered ? 1.15 : 1 }],
+        } as any)
+      : undefined;
+
+  return (
+    <View style={[styles.innerWrapper, isHovered && styles.activeCard]}>
+      {/* Burger Image Container with Soft Glow Box */}
+      <View pointerEvents="none" style={styles.imageBox}>
+        {/* Rectangle 2 from assets */}
+        {Platform.OS === 'web' ? (
+          <Image
+            source={require('@/assets/Rectangle 2.png')}
+            style={[styles.glowBg, webGlowStyle]}
+            resizeMode="contain"
+          />
+        ) : (
+          <Animated.Image
+            source={require('@/assets/Rectangle 2.png')}
+            style={[styles.glowBg, animatedGlowStyle]}
+            resizeMode="contain"
+          />
+        )}
+        {/* Animated Burger Photo */}
+        {Platform.OS === 'web' ? (
+          <Image
+            source={burger.image}
+            style={[styles.burgerImg, webBurgerStyle]}
+            resizeMode="contain"
+          />
+        ) : (
+          <Animated.Image
+            source={burger.image}
+            style={[styles.burgerImg, animatedBurgerStyle]}
+            resizeMode="contain"
+          />
+        )}
+      </View>
+
+      {/* Burger Texts & Price */}
+      <View pointerEvents="none" style={styles.cardInfo}>
+        <Text style={styles.burgerName} numberOfLines={1}>
+          {burger.name}
+        </Text>
+
+        <Text style={styles.burgerDesc} numberOfLines={1}>
+          {burger.description}
+        </Text>
+
+        <View style={styles.priceRow}>
+          <Text style={styles.burgerPrice}>{burger.price}</Text>
+
+          <View style={styles.addButton}>
+            <Ionicons name="add" size={17} color="#FFFFFF" />
+          </View>
+        </View>
+      </View>
+    </View>
+  );
+}
+
+function AnimatedBurgerCard({
+  burger,
+  index,
+}: {
+  burger: BurgerItem;
+  index: number;
+}) {
+  const [isHovered, setIsHovered] = useState(false);
+
+  const handleHoverIn = () => setIsHovered(true);
+  const handleHoverOut = () => setIsHovered(false);
+
+  const webMouseHandlers =
+    Platform.OS === 'web'
+      ? ({
+          onMouseEnter: handleHoverIn,
+          onMouseLeave: handleHoverOut,
+          onPointerEnter: handleHoverIn,
+          onPointerLeave: handleHoverOut,
+        } as any)
+      : {};
+
+  return (
+    <View
+      {...webMouseHandlers}
+      style={[styles.card, isHovered && styles.activeCard]}>
+      <Pressable
+        onHoverIn={handleHoverIn}
+        onHoverOut={handleHoverOut}
+        onPressIn={handleHoverIn}
+        onPressOut={handleHoverOut}
+        {...webMouseHandlers}
+        style={[
+          styles.cardInner,
+          Platform.OS === 'web' && ({ cursor: 'pointer' } as any),
+        ]}>
+        <BurgerCardContent
+          burger={burger}
+          index={index}
+          isHovered={isHovered}
+        />
+      </Pressable>
+    </View>
+  );
+}
+
 export default function HomeScreen() {
   const [selectedCategory, setSelectedCategory] = useState('Burger');
 
@@ -75,9 +262,10 @@ export default function HomeScreen() {
       <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
         {/* Top Header */}
         <View style={styles.header}>
-          {/* Two-Line Menu Icon */}
+          {/* Three-Line Staggered Menu Icon */}
           <TouchableOpacity activeOpacity={0.7} style={styles.menuButton}>
             <View style={styles.menuLineTop} />
+            <View style={styles.menuLineMiddle} />
             <View style={styles.menuLineBottom} />
           </TouchableOpacity>
 
@@ -132,81 +320,58 @@ export default function HomeScreen() {
 
           {/* Burgers 2-Column Grid */}
           <View style={styles.gridContainer}>
-            {BURGERS.map((burger) => (
-              <View key={burger.id} style={styles.card}>
-                <View style={styles.cardInner}>
-                  {/* Burger Image Container with Soft Glow Box */}
-                  <View style={styles.imageBox}>
-                    {/* Rectangle 2 from assets */}
-                    <Image
-                      source={require('@/assets/Rectangle 2.png')}
-                      style={styles.glowBg}
-                      resizeMode="contain"
-                    />
-                    {/* Actual Burger Photo */}
-                    <Image
-                      source={burger.image}
-                      style={styles.burgerImg}
-                      resizeMode="contain"
-                    />
-                  </View>
-
-                  {/* Burger Texts & Price */}
-                  <View style={styles.cardInfo}>
-                    <Text style={styles.burgerName} numberOfLines={1}>
-                      {burger.name}
-                    </Text>
-
-                    <Text style={styles.burgerDesc} numberOfLines={1}>
-                      {burger.description}
-                    </Text>
-
-                    <View style={styles.priceRow}>
-                      <Text style={styles.burgerPrice}>{burger.price}</Text>
-
-                      <TouchableOpacity
-                        activeOpacity={0.8}
-                        style={styles.addButton}>
-                        <Ionicons name="add" size={17} color="#FFFFFF" />
-                      </TouchableOpacity>
-                    </View>
-                  </View>
-                </View>
-              </View>
+            {BURGERS.map((burger, index) => (
+              <AnimatedBurgerCard
+                key={burger.id}
+                burger={burger}
+                index={index}
+              />
             ))}
           </View>
         </ScrollView>
-
-        {/* Floating Bottom Navigation Bar */}
-        <View style={styles.bottomBarContainer}>
-          <View style={styles.bottomBar}>
-            {/* Location Pin */}
-            <TouchableOpacity activeOpacity={0.7} style={styles.navButton}>
-              <Ionicons name="location-outline" size={26} color="#2A6CD6" />
-            </TouchableOpacity>
-
-            {/* Center Floating Pink Cart Button */}
-            <TouchableOpacity
-              activeOpacity={0.85}
-              style={styles.pinkCartButton}>
-              <Image
-                source={require('@/assets/Vector.png')}
-                style={styles.cartIcon}
-                resizeMode="contain"
-              />
-            </TouchableOpacity>
-
-            {/* Piggy Bank Icon from Assets */}
-            <TouchableOpacity activeOpacity={0.7} style={styles.navButton}>
-              <Image
-                source={require('@/assets/Vector (1).png')}
-                style={styles.piggyIcon}
-                resizeMode="contain"
-              />
-            </TouchableOpacity>
-          </View>
-        </View>
       </SafeAreaView>
+
+      {/* Floating Bottom Navigation Bar (Figma Rectangle 6) */}
+      <View
+        style={[
+          styles.bottomBar,
+          Platform.OS === 'web' &&
+            ({
+              boxShadow: '0px 10px 4px rgba(0, 0, 0, 0.25)',
+            } as any),
+        ]}>
+        {/* Arka plan katmanı: Figma matrix(1, 0, 0, -1, 0, 0) */}
+        <View style={styles.bottomBarBg} pointerEvents="none" />
+
+        {/* Location Pin */}
+        <TouchableOpacity activeOpacity={0.7} style={styles.navButton}>
+          <Image
+            source={require('@/assets/location-icon.png')}
+            style={styles.locationIcon}
+            resizeMode="contain"
+          />
+        </TouchableOpacity>
+
+        {/* Center Pink Cart Button */}
+        <TouchableOpacity
+          activeOpacity={0.85}
+          style={styles.pinkCartButton}>
+          <Image
+            source={require('@/assets/Vector.png')}
+            style={styles.cartIcon}
+            resizeMode="contain"
+          />
+        </TouchableOpacity>
+
+        {/* Piggy Bank Icon from Assets */}
+        <TouchableOpacity activeOpacity={0.7} style={styles.navButton}>
+          <Image
+            source={require('@/assets/Vector (1).png')}
+            style={styles.piggyIcon}
+            resizeMode="contain"
+          />
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }
@@ -231,21 +396,31 @@ const styles = StyleSheet.create({
     paddingBottom: 16,
   },
   menuButton: {
+    width: 32,
     padding: 6,
     justifyContent: 'center',
   },
   menuLineTop: {
-    width: 22,
-    height: 3,
+    width: 11,
+    height: 2.5,
     backgroundColor: '#FFFFFF',
     borderRadius: 2,
-    marginBottom: 5,
+    alignSelf: 'flex-end',
+    marginBottom: 4,
+  },
+  menuLineMiddle: {
+    width: 20,
+    height: 2.5,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 2,
+    marginBottom: 4,
   },
   menuLineBottom: {
-    width: 14,
-    height: 3,
+    width: 11,
+    height: 2.5,
     backgroundColor: '#FFFFFF',
     borderRadius: 2,
+    alignSelf: 'flex-start',
   },
   bellButton: {
     padding: 4,
@@ -310,22 +485,22 @@ const styles = StyleSheet.create({
   },
   filterButton: {
     padding: 4,
-    alignItems: 'flex-end',
+    alignItems: 'center',
     justifyContent: 'center',
   },
   filterLine1: {
-    width: 16,
+    width: 18,
     height: 2.5,
     backgroundColor: '#FFFFFF',
     borderRadius: 2,
-    marginBottom: 3,
+    marginBottom: 3.5,
   },
   filterLine2: {
-    width: 11,
+    width: 12,
     height: 2.5,
     backgroundColor: '#FFFFFF',
     borderRadius: 2,
-    marginBottom: 3,
+    marginBottom: 3.5,
   },
   filterLine3: {
     width: 6,
@@ -337,14 +512,26 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-between',
+    overflow: 'visible',
   },
   card: {
     width: CARD_WIDTH,
     marginBottom: 28,
     alignItems: 'center',
+    zIndex: 1,
+    overflow: 'visible',
+  },
+  activeCard: {
+    zIndex: 30,
   },
   cardInner: {
+    width: '100%',
+    alignItems: 'center',
+    overflow: 'visible',
+  },
+  innerWrapper: {
     width: BOX_SIZE,
+    overflow: 'visible',
   },
   cardInfo: {
     width: '100%',
@@ -358,6 +545,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     position: 'relative',
     marginBottom: 8,
+    overflow: 'visible',
   },
   glowBg: {
     position: 'absolute',
@@ -365,8 +553,8 @@ const styles = StyleSheet.create({
     height: BOX_SIZE,
   },
   burgerImg: {
-    width: BOX_SIZE * 0.9,
-    height: BOX_SIZE * 0.75,
+    width: BOX_SIZE * 0.94,
+    height: BOX_SIZE * 0.8,
   },
   burgerName: {
     color: '#FFFFFF',
@@ -390,7 +578,7 @@ const styles = StyleSheet.create({
     marginTop: 6,
   },
   burgerPrice: {
-    color: '#80BDF3',
+    color: '#88F9E4',
     fontSize: 15,
     fontWeight: '400',
   },
@@ -407,25 +595,33 @@ const styles = StyleSheet.create({
     shadowRadius: 3,
     elevation: 2,
   },
-  bottomBarContainer: {
-    position: 'absolute',
-    bottom: 22,
-    left: 20,
-    right: 20,
-  },
   bottomBar: {
+    position: 'absolute',
+    left: '2.93%' as any,
+    right: '3.2%' as any,
+    top: '91.5%' as any,
+    bottom: '1.6%' as any,
     backgroundColor: '#FFFFFF',
-    borderRadius: 35,
-    height: 64,
-    paddingHorizontal: 30,
+    borderRadius: 47,
+    paddingHorizontal: 36,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.18,
-    shadowRadius: 18,
-    elevation: 12,
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 10,
+  },
+  bottomBarBg: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 47,
+    transform: [{ scaleY: -1 }],
   },
   navButton: {
     padding: 8,
@@ -437,17 +633,20 @@ const styles = StyleSheet.create({
     backgroundColor: '#EF4B81',
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: -22,
     shadowColor: '#EF4B81',
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.45,
-    shadowRadius: 10,
-    elevation: 8,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.35,
+    shadowRadius: 8,
+    elevation: 6,
   },
   cartIcon: {
-    width: 24,
-    height: 22,
+    width: 22,
+    height: 20,
     tintColor: '#FFFFFF',
+  },
+  locationIcon: {
+    width: 26,
+    height: 24,
   },
   piggyIcon: {
     width: 26,
