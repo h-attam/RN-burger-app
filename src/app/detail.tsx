@@ -289,8 +289,8 @@ const styles = StyleSheet.create({
   },
   tomatoImage: {
     position: 'absolute',
-    width: Math.min(SCREEN_WIDTH * 0.54, 230),
-    height: Math.min(SCREEN_WIDTH * 0.39, 165),
+    width: 188.82,
+    height: 141.62,
     zIndex: 10,
   },
   bottomContent: {
