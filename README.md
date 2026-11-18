@@ -2,9 +2,9 @@
 
 Bu proje, modern bir mobil restoran ve burger siparis arayuzunun Figma tasarimina birebir sadik kalinarak gelistirilmis bir React Native uygulamasidir. Figma prototipindeki tum detaylar, renk gecisleri, tipografi ve mikro-etkilesimli animasyonlar ozenle koda aktarilmistir.
 
-<p align="center">
-  <img src="assets/app-demo.gif" alt="Uygulama Onizlemesi" width="300" />
-</p>
+<div align="center">
+  <img src="./assets/app-demo.gif" width="300" alt="Uygulama Onizlemesi" />
+</div>
 
 ## Tasarim Referansi
 
