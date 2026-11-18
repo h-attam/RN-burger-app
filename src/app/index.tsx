@@ -1,5 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
+import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import React, { useEffect, useState } from 'react';
 import {
@@ -224,6 +225,18 @@ function AnimatedBurgerCard({
   const handleHoverIn = () => setIsHovered(true);
   const handleHoverOut = () => setIsHovered(false);
 
+  const handlePress = () => {
+    router.push({
+      pathname: '/detail',
+      params: {
+        id: burger.id,
+        name: burger.name,
+        description: burger.description,
+        price: burger.price,
+      },
+    });
+  };
+
   const webMouseHandlers =
     Platform.OS === 'web'
       ? ({
@@ -239,6 +252,7 @@ function AnimatedBurgerCard({
       {...webMouseHandlers}
       style={[styles.card, isHovered && styles.activeCard]}>
       <Pressable
+        onPress={handlePress}
         onHoverIn={handleHoverIn}
         onHoverOut={handleHoverOut}
         onPressIn={handleHoverIn}
