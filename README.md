@@ -1,56 +1,76 @@
-# Welcome to your Expo app 👋
+# Burger Siparis Uygulamasi (RN Burger App)
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Bu proje, modern bir mobil restoran ve burger siparis arayuzunun Figma tasarimina birebir sadik kalinarak gelistirilmis bir React Native uygulamasidir. Figma prototipindeki tum detaylar, renk gecisleri, tipografi ve mikro-etkilesimli animasyonlar ozenle koda aktarilmistir.
 
-## Get started
+## Tasarim Referansi
 
-1. Install dependencies
+Uygulamanin tum ekranlari, bilesenleri, renk paletleri ve animasyon akislari ozel bir Figma tasarimi referans alinarak hazirlanmistir:
+- Derin mavi ve mor tonlarindaki ozel arka plan gradyanlari
+- Urun listeleme kartlari ve hover/dokunma efektleri
+- Urun detay sayfasindaki dinamik perspektif ve gecis animasyonlari
+- Sepete ekleme sonrasi onay durumu ekrani (Done / Oder added to the cart)
 
-   ```bash
-   npm install
-   ```
+## Kullanilan Teknolojiler
 
-2. Start the app
+- React Native (0.88.1)
+- React (19.3.0)
+- Expo (SDK 58)
+- Expo Router (Dosya tabanli yonlendirme mimarisi)
+- TypeScript (Tip guvenligi ve guclu tip tanimlari)
+- React Native Reanimated (4.7.1 - Yuksek performansli 60/120 fps arayuz animasyonlari)
+- NativeWind & Tailwind CSS (Yardimci stil siniflari)
+- Expo Linear Gradient (Figma gradyan gecisleri)
+- Expo Vector Icons (Ionicons ikon seti)
+- React Native Safe Area Context (Cihaz centik ve guvenli alan yonetimi)
 
-   ```bash
-   npx expo start
-   ```
+## Ekranlar ve Ozellikler
 
-In the output, you'll find options to open the app in a
+### 1. Ana Sayfa (Home Screen)
+- Sol ust menu butonu ve bildirim zili
+- Baslik ve kategoriye gore dinamik alt baslik alani
+- Kategori secim kapsulleri (Burger, Pasta, Salads)
+- 2 sutunlu urun kartlari grid yapisi:
+  - Urun gorsellerinin uzerine gelindiginde veya dokunuldugunda sag/sol kolona gore farkli acilarda donme (+10deg / -10deg), yukari kayma ve buyume animasyonu
+  - Sadece kart uzerindeki arti butonuna tiklandiginda detay sayfasina gecis
+- Alt gezinme cubugu (Ozel sepet butonu ve konum/kumbara ikonlari)
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+### 2. Urun Detay Sayfasi (Product Detail Screen)
+- Geri donus ve secenekler ust cubugu
+- Giris Animasyonu: Detay sayfasina girildiginde burger ve dilimlenmis domates gorselleri sagdan ekrana girer; burger tam ortaya otururken domates dilimi one ve sola dogru firlayarak perspektif etkisi olusturur.
+- Cift Burger Animasyonu: Miktar artirildiginda (adet 2 veya uzeri oldugunda), birinci burgerin arkasindan ikinci bir burger animasyonla sag uste cikar ve on burger hafif sola acilarak derinlik saglar. Miktar 1'e dusuruldugunde arka burger tekrar saklanir.
+- Etkilesimli adet secici (+ / -) ve Figma prototipine uygun fiyatlandirma mantigi.
+- Ozel pembe "Add to cart" butonu.
 
-You can start developing by editing the files inside the **src/app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+### 3. Sepet Onay Ekrani (Cart Success Screen)
+- Figma Frame 9 tasarimiyla birebir uyumlu onay ekrani.
+- Pembe kutucuk ve cift onay (tick) isareti.
+- "Done!" ve "Oder added to the cart" bilgilendirme metinleri.
+- Ekrana dokunuldugunda veya belirli bir sure sonra otomatik olarak ana sayfaya donus.
 
-## Get a fresh project
+## Kurulum ve Calistirma
 
-When you're ready, run:
+Projeyi yerel ortamda calistirmak icin asagidaki adimlari izleyebilirsiniz:
 
+1. Bagimliliklari yukleyin:
 ```bash
-npm run reset-project
+npm install
 ```
 
-This command will move the starter code to the **example** directory and create a blank **src/app** directory where you can start developing.
+2. Gelistirme sunucusunu baslatin:
+```bash
+npx expo start
+```
 
-### Other setup steps
+3. Uygulamayi calistirmak istediginiz platformu secin:
+- iOS Simulator icin: Terminalde `i` tusuna basin
+- Android Emulator icin: Terminalde `a` tusuna basin
+- Web tarayici icin: Terminalde `w` tusuna basin
+- Gercek cihazda test etmek icin: Cihazinizdaki Expo Go uygulamasi ile terminaldeki QR kodu taratin
 
-- To set up ESLint for linting, run `npx expo lint`, or follow our guide on ["Using ESLint and Prettier"](https://docs.expo.dev/guides/using-eslint/)
-- If you'd like to set up unit testing, follow our guide on ["Unit Testing with Jest"](https://docs.expo.dev/develop/unit-testing/)
-- Learn more about the TypeScript setup in this template in our guide on ["Using TypeScript"](https://docs.expo.dev/guides/typescript/)
+## Kod Standartlari ve Kontroller
 
-## Learn more
+Projede TypeScript tip kontrolleri asagidaki komutla yapilabilir:
 
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+```bash
+npx tsc --noEmit
+```
