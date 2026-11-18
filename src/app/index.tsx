@@ -83,10 +83,12 @@ function BurgerCardContent({
   burger,
   index,
   isHovered,
+  onAddPress,
 }: {
   burger: BurgerItem;
   index: number;
   isHovered: boolean;
+  onAddPress: () => void;
 }) {
   // 1. ve 3. ürünler (sol kolon, index 0 ve 2) -> Sağa dönecek (+10deg)
   // 2. ve 4. ürünler (sağ kolon, index 1 ve 3) -> Sola dönecek (-10deg)
@@ -192,7 +194,7 @@ function BurgerCardContent({
       </View>
 
       {/* Burger Texts & Price */}
-      <View pointerEvents="none" style={styles.cardInfo}>
+      <View style={styles.cardInfo}>
         <Text style={styles.burgerName} numberOfLines={1}>
           {burger.name}
         </Text>
@@ -204,9 +206,12 @@ function BurgerCardContent({
         <View style={styles.priceRow}>
           <Text style={styles.burgerPrice}>{burger.price}</Text>
 
-          <View style={styles.addButton}>
+          <TouchableOpacity
+            activeOpacity={0.7}
+            onPress={onAddPress}
+            style={styles.addButton}>
             <Ionicons name="add" size={17} color="#FFFFFF" />
-          </View>
+          </TouchableOpacity>
         </View>
       </View>
     </View>
@@ -252,7 +257,6 @@ function AnimatedBurgerCard({
       {...webMouseHandlers}
       style={[styles.card, isHovered && styles.activeCard]}>
       <Pressable
-        onPress={handlePress}
         onHoverIn={handleHoverIn}
         onHoverOut={handleHoverOut}
         onPressIn={handleHoverIn}
@@ -260,12 +264,13 @@ function AnimatedBurgerCard({
         {...webMouseHandlers}
         style={[
           styles.cardInner,
-          Platform.OS === 'web' && ({ cursor: 'pointer' } as any),
+          Platform.OS === 'web' && ({ cursor: 'default' } as any),
         ]}>
         <BurgerCardContent
           burger={burger}
           index={index}
           isHovered={isHovered}
+          onAddPress={handlePress}
         />
       </Pressable>
     </View>
