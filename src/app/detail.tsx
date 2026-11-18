@@ -17,6 +17,7 @@ import Animated, {
   interpolate,
   useAnimatedStyle,
   useSharedValue,
+  withSpring,
   withTiming,
 } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -41,10 +42,24 @@ export default function ProductDetailScreen() {
   const unitPrice = parseFloat(rawPriceStr.replace(/[^0-9.]/g, '')) || 18.0;
 
   const [quantity, setQuantity] = useState(1);
-  const totalPrice = `$${(unitPrice * quantity).toFixed(2)}`;
+
+  // Figma'daki özel fiyatlama: 1 burger = $18.00, 2 burger = $26.00 (+8)
+  const calculatePrice = (qty: number) => {
+    const base = unitPrice;
+    if (base === 18) {
+      if (qty === 1) return '$18.00';
+      if (qty === 2) return '$26.00';
+      return `$${(26 + (qty - 2) * 10).toFixed(2)}`;
+    }
+    return `$${(base * qty).toFixed(2)}`;
+  };
+
+  const totalPrice = calculatePrice(quantity);
 
   // Animation shared value: 0 = State 1 (ilk görsel), 1 = State 2 (ikinci görsel / öne doğru sola kaymış)
   const animProgress = useSharedValue(0);
+  // İkinci burger animasyonu: quantity >= 2 olduğunda 1 olur
+  const secondBurgerProgress = useSharedValue(0);
   const [webAnimated, setWebAnimated] = useState(false);
 
   useEffect(() => {
@@ -62,22 +77,89 @@ export default function ProductDetailScreen() {
     }
   }, [animProgress]);
 
-  // Burger Animasyon Stili (Daha sağdan başlayıp tam ORTADA konumlanma + öne gelerek büyüme)
+  useEffect(() => {
+    secondBurgerProgress.value = withSpring(quantity >= 2 ? 1 : 0, {
+      damping: 15,
+      stiffness: 110,
+    });
+  }, [quantity, secondBurgerProgress]);
+
+  // Ön Burger Animasyon Stili:
+  // - Girişte: sağdan gelip merkeze yerleşir
+  // - 2. burger geldiğinde: hafif sol-aşağı açılarak arka burgere yer açar
   const animatedBurgerStyle = useAnimatedStyle(() => {
-    const tx = interpolate(
+    const entranceTx = interpolate(
       animProgress.value,
       [0, 1],
       [SCREEN_WIDTH * 0.22, 0]
     );
-    const ty = interpolate(
+    const splitTx = interpolate(
+      secondBurgerProgress.value,
+      [0, 1],
+      [0, -SCREEN_WIDTH * 0.11]
+    );
+
+    const entranceTy = interpolate(
       animProgress.value,
       [0, 1],
       [SCREEN_WIDTH * 0.02, 0]
     );
-    const scale = interpolate(animProgress.value, [0, 1], [0.92, 1.04]);
-    const rot = interpolate(animProgress.value, [0, 1], [3, 0]);
+    const splitTy = interpolate(
+      secondBurgerProgress.value,
+      [0, 1],
+      [0, SCREEN_HEIGHT * 0.02]
+    );
+
+    const entranceScale = interpolate(animProgress.value, [0, 1], [0.92, 1.04]);
+    const splitScale = interpolate(
+      secondBurgerProgress.value,
+      [0, 1],
+      [1, 0.96]
+    );
+
+    const entranceRot = interpolate(animProgress.value, [0, 1], [3, 0]);
+    const splitRot = interpolate(
+      secondBurgerProgress.value,
+      [0, 1],
+      [0, -4]
+    );
 
     return {
+      transform: [
+        { translateX: entranceTx + splitTx },
+        { translateY: entranceTy + splitTy },
+        { scale: entranceScale * splitScale },
+        { rotate: `${entranceRot + splitRot}deg` },
+      ],
+    };
+  });
+
+  // Arka Burger Animasyon Stili (Quantity >= 2 olduğunda sağ üst arkadan çıkar)
+  const animatedRearBurgerStyle = useAnimatedStyle(() => {
+    const opacity = interpolate(
+      secondBurgerProgress.value,
+      [0, 0.15, 1],
+      [0, 0.85, 1]
+    );
+    const tx = interpolate(
+      secondBurgerProgress.value,
+      [0, 1],
+      [0, SCREEN_WIDTH * 0.23]
+    );
+    const ty = interpolate(
+      secondBurgerProgress.value,
+      [0, 1],
+      [0, -SCREEN_HEIGHT * 0.045]
+    );
+    const scale = interpolate(
+      secondBurgerProgress.value,
+      [0, 1],
+      [0.65, 0.88]
+    );
+    const rot = interpolate(secondBurgerProgress.value, [0, 1], [0, 7]);
+
+    return {
+      opacity,
       transform: [
         { translateX: tx },
         { translateY: ty },
@@ -87,25 +169,37 @@ export default function ProductDetailScreen() {
     };
   });
 
-  // Domates Dilimi Animasyon Stili (Sağ alttan sol öne doğru fırlama ve dengeli konumlanma)
+  // Domates Dilimi Animasyon Stili
   const animatedTomatoStyle = useAnimatedStyle(() => {
-    const tx = interpolate(
+    const entranceTx = interpolate(
       animProgress.value,
       [0, 1],
       [SCREEN_WIDTH * 0.34, -SCREEN_WIDTH * 0.08]
     );
-    const ty = interpolate(
+    const splitTx = interpolate(
+      secondBurgerProgress.value,
+      [0, 1],
+      [0, -SCREEN_WIDTH * 0.06]
+    );
+
+    const entranceTy = interpolate(
       animProgress.value,
       [0, 1],
       [SCREEN_WIDTH * 0.12, SCREEN_WIDTH * 0.16]
     );
+    const splitTy = interpolate(
+      secondBurgerProgress.value,
+      [0, 1],
+      [0, SCREEN_HEIGHT * 0.015]
+    );
+
     const scale = interpolate(animProgress.value, [0, 1], [0.70, 1.04]);
     const rot = interpolate(animProgress.value, [0, 1], [18, -12]);
 
     return {
       transform: [
-        { translateX: tx },
-        { translateY: ty },
+        { translateX: entranceTx + splitTx },
+        { translateY: entranceTy + splitTy },
         { scale },
         { rotate: `${rot}deg` },
       ],
@@ -113,19 +207,50 @@ export default function ProductDetailScreen() {
   });
 
   // Web Platformu için CSS transition desteği
+  const isTwoBurgers = quantity >= 2;
   const webBurgerStyle =
     Platform.OS === 'web'
       ? ({
-          transition: 'transform 850ms cubic-bezier(0.33, 1, 0.68, 1)',
+          transition: 'all 500ms cubic-bezier(0.33, 1, 0.68, 1)',
           transform: [
             {
-              translateX: webAnimated ? 0 : SCREEN_WIDTH * 0.22,
+              translateX: !webAnimated
+                ? SCREEN_WIDTH * 0.22
+                : isTwoBurgers
+                ? -SCREEN_WIDTH * 0.11
+                : 0,
             },
             {
-              translateY: webAnimated ? 0 : SCREEN_WIDTH * 0.02,
+              translateY: !webAnimated
+                ? SCREEN_WIDTH * 0.02
+                : isTwoBurgers
+                ? SCREEN_HEIGHT * 0.02
+                : 0,
             },
-            { scale: webAnimated ? 1.04 : 0.92 },
-            { rotate: webAnimated ? '0deg' : '3deg' },
+            {
+              scale: !webAnimated ? 0.92 : isTwoBurgers ? 0.99 : 1.04,
+            },
+            {
+              rotate: !webAnimated ? '3deg' : isTwoBurgers ? '-4deg' : '0deg',
+            },
+          ],
+        } as any)
+      : undefined;
+
+  const webRearBurgerStyle =
+    Platform.OS === 'web'
+      ? ({
+          transition: 'all 500ms cubic-bezier(0.33, 1, 0.68, 1)',
+          opacity: isTwoBurgers ? 1 : 0,
+          transform: [
+            {
+              translateX: isTwoBurgers ? SCREEN_WIDTH * 0.23 : 0,
+            },
+            {
+              translateY: isTwoBurgers ? -SCREEN_HEIGHT * 0.045 : 0,
+            },
+            { scale: isTwoBurgers ? 0.88 : 0.65 },
+            { rotate: isTwoBurgers ? '7deg' : '0deg' },
           ],
         } as any)
       : undefined;
@@ -133,17 +258,21 @@ export default function ProductDetailScreen() {
   const webTomatoStyle =
     Platform.OS === 'web'
       ? ({
-          transition: 'transform 850ms cubic-bezier(0.33, 1, 0.68, 1)',
+          transition: 'all 500ms cubic-bezier(0.33, 1, 0.68, 1)',
           transform: [
             {
-              translateX: webAnimated
-                ? -SCREEN_WIDTH * 0.08
-                : SCREEN_WIDTH * 0.34,
+              translateX: !webAnimated
+                ? SCREEN_WIDTH * 0.34
+                : isTwoBurgers
+                ? -SCREEN_WIDTH * 0.14
+                : -SCREEN_WIDTH * 0.08,
             },
             {
-              translateY: webAnimated
-                ? SCREEN_WIDTH * 0.16
-                : SCREEN_WIDTH * 0.12,
+              translateY: !webAnimated
+                ? SCREEN_WIDTH * 0.12
+                : isTwoBurgers
+                ? SCREEN_WIDTH * 0.175
+                : SCREEN_WIDTH * 0.16,
             },
             { scale: webAnimated ? 1.04 : 0.70 },
             { rotate: webAnimated ? '-12deg' : '18deg' },
@@ -179,9 +308,21 @@ export default function ProductDetailScreen() {
           </TouchableOpacity>
         </View>
 
-        {/* Görsel Sahnesi: Burger ve Uçan Domates Dilimi */}
+        {/* Görsel Sahnesi: Burgerler ve Uçan Domates Dilimi */}
         <View style={styles.heroSection}>
-          {/* Ana Burger Görseli */}
+          {/* Arka Burger Görseli (Quantity >= 2 olduğunda sağ üst arkadan çıkar) */}
+          <Animated.Image
+            source={require('@/assets/detail_burger.png')}
+            style={[
+              styles.rearBurgerImage,
+              Platform.OS === 'web'
+                ? webRearBurgerStyle
+                : animatedRearBurgerStyle,
+            ]}
+            resizeMode="contain"
+          />
+
+          {/* Ön Burger Görseli */}
           <Animated.Image
             source={require('@/assets/detail_burger.png')}
             style={[
@@ -282,10 +423,16 @@ const styles = StyleSheet.create({
     overflow: 'visible',
     minHeight: SCREEN_HEIGHT * 0.38,
   },
+  rearBurgerImage: {
+    position: 'absolute',
+    width: Math.min(SCREEN_WIDTH * 0.94, 400),
+    height: Math.min(SCREEN_WIDTH * 0.72, 310),
+    zIndex: 1,
+  },
   burgerImage: {
     width: Math.min(SCREEN_WIDTH * 0.94, 400),
     height: Math.min(SCREEN_WIDTH * 0.72, 310),
-    zIndex: 2,
+    zIndex: 3,
   },
   tomatoImage: {
     position: 'absolute',
