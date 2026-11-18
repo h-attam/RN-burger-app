@@ -380,7 +380,10 @@ export default function ProductDetailScreen() {
           </View>
 
           {/* Sepete Ekle Butonu (Add to cart) */}
-          <TouchableOpacity activeOpacity={0.85} style={styles.addToCartButton}>
+          <TouchableOpacity
+            activeOpacity={0.85}
+            onPress={() => router.push('/cart-success')}
+            style={styles.addToCartButton}>
             <Image
               source={require('@/assets/Vector.png')}
               style={styles.cartIcon}
