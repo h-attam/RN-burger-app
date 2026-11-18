@@ -61,68 +61,6 @@ const BURGERS: BurgerItem[] = [
   },
 ];
 
-const PASTAS: BurgerItem[] = [
-  {
-    id: 'p1',
-    name: 'Carbonara',
-    description: 'Spaghetti with bacon',
-    price: '$14.00',
-    image: require('@/assets/pasta/carbonara.png'),
-  },
-  {
-    id: 'p2',
-    name: 'Bolognese',
-    description: 'Tagliatelle beef ragu',
-    price: '$15.00',
-    image: require('@/assets/pasta/bolognese.png'),
-  },
-  {
-    id: 'p3',
-    name: 'Pesto Fusilli',
-    description: 'Fresh basil & pine nuts',
-    price: '$13.00',
-    image: require('@/assets/pasta/pesto.png'),
-  },
-  {
-    id: 'p4',
-    name: 'Seafood Pasta',
-    description: 'Garlic cream & shrimp',
-    price: '$17.00',
-    image: require('@/assets/pasta/seafood-pasta.png'),
-  },
-];
-
-const SALADS: BurgerItem[] = [
-  {
-    id: 's1',
-    name: 'Caesar Salad',
-    description: 'Chicken & parmesan',
-    price: '$11.00',
-    image: require('@/assets/salads/caesar-salad.png'),
-  },
-  {
-    id: 's2',
-    name: 'Greek Salad',
-    description: 'Feta & kalamata olives',
-    price: '$10.00',
-    image: require('@/assets/salads/greek-salad.png'),
-  },
-  {
-    id: 's3',
-    name: 'Avocado Salad',
-    description: 'Fresh greens & seeds',
-    price: '$12.00',
-    image: require('@/assets/salads/avocado-salad.png'),
-  },
-  {
-    id: 's4',
-    name: 'Caprese Salad',
-    description: 'Mozzarella & tomato',
-    price: '$11.00',
-    image: require('@/assets/salads/caprese-salad.png'),
-  },
-];
-
 const CATEGORY_DATA: Record<string, { subtitle: string; items: BurgerItem[] }> = {
   Burger: {
     subtitle: 'delicious burgers!',
@@ -130,11 +68,11 @@ const CATEGORY_DATA: Record<string, { subtitle: string; items: BurgerItem[] }> =
   },
   Pasta: {
     subtitle: 'delicious pastas!',
-    items: PASTAS,
+    items: [],
   },
   Salads: {
     subtitle: 'fresh salads!',
-    items: SALADS,
+    items: [],
   },
 };
 
