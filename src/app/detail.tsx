@@ -352,7 +352,7 @@ const styles = StyleSheet.create({
   },
   totalPriceLabel: {
     fontSize: 11.5,
-    color: '#8A9DBA',
+    color: '#FFFFFF',
     fontWeight: '400',
     marginBottom: 1,
   },
